@@ -25,11 +25,29 @@ package de.pilzschaf.rootexample;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import de.pilzschaf.rootexample.shell.CommandExecutionException;
+import de.pilzschaf.rootexample.shell.CommandOutput;
+import de.pilzschaf.rootexample.shell.Shell;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Shell shell = new Shell();
+        try {
+            //Command requires root privileges to output
+            CommandOutput output = shell.executeRootCommand("ls -la /data");
+            if(output.exitCode != 0 && output.error.contains("Permission denied")) {
+                System.out.println("Root not granted");
+            }else {
+                System.out.println(output);
+            }
+        } catch (CommandExecutionException e) {
+            System.out.println("Error executing command");
+            System.out.println("Device not rooted?");
+            e.printStackTrace();
+        }
     }
 }
